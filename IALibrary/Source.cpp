@@ -284,7 +284,7 @@ int acquireIm(unsigned char* bp)
         lResult = lPipeline.RetrieveNextBuffer(&lBuffer, 1000, &lOperationResult);
         auto stop = high_resolution_clock::now();
         // If debug is enabled, print time measurment to the lo file
-        if(enableDebug) logfile << "loop index: " << i << ", Retrieve duration: " << duration_cast<microseconds>(stop - start).count() << ", Result Code: " << lOperationResult.GetCodeString() << ", result description: " << lOperationResult.GetDescription();
+        if(enableDebug) logfile << "loop index: " << i << ", Retrieve duration: " << duration_cast<microseconds>(stop - start).count() << "[us]" << ", Result Code: " << lOperationResult.GetCodeString() << ", result description: " << lOperationResult.GetDescription();
 
         if (lResult.IsOK())
         {
@@ -303,7 +303,7 @@ int acquireIm(unsigned char* bp)
                     stop = high_resolution_clock::now();
                     bp = bp + lWidth * lHeight * 2 * sizeof(PvUInt8);
                     // If debug is enabled, print time measurment to the log file
-                    if (enableDebug) logfile << " memcpy: " << duration_cast<microseconds>(stop - start).count() << " , ";
+                    if (enableDebug) logfile << " memcpy: " << duration_cast<microseconds>(stop - start).count() << "[us] , ";
                 }
 
             }
@@ -312,7 +312,7 @@ int acquireIm(unsigned char* bp)
             //lStream.QueueBuffer(lBuffer);
             lPipeline.ReleaseBuffer(lBuffer);
             stop = high_resolution_clock::now();
-            if (enableDebug) logfile << " queue buffer: " << duration_cast<microseconds>(stop - start).count() << "ms";
+            if (enableDebug) logfile << " queue buffer: " << duration_cast<microseconds>(stop - start).count() << "[us]";
         }
         if (enableDebug) logfile << "\n";
     }
