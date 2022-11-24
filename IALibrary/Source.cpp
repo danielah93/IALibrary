@@ -284,7 +284,7 @@ int acquireIm(unsigned char* bp)
         lResult = lPipeline.RetrieveNextBuffer(&lBuffer, 1000, &lOperationResult);
         auto stop = high_resolution_clock::now();
         // If debug is enabled, print time measurment to the lo file
-        if(enableDebug) logfile << "loop index: " << i << ", Retrieve duration: " << duration_cast<microseconds>(stop - start).count() << "[us]" << ", Result Code: " << lOperationResult.GetCodeString() << ", result description: " << lOperationResult.GetDescription();
+        if(enableDebug) logfile << "loop index: " << i << ", Retrieve duration: " << duration_cast<microseconds>(stop - start).count() << ", Result Code: " << lOperationResult.GetCodeString() << ", result description: " << lOperationResult.GetDescription();
 
         if (lResult.IsOK())
         {
@@ -303,7 +303,7 @@ int acquireIm(unsigned char* bp)
                     stop = high_resolution_clock::now();
                     bp = bp + lWidth * lHeight * 2 * sizeof(PvUInt8);
                     // If debug is enabled, print time measurment to the log file
-                    if (enableDebug) logfile << " memcpy: " << duration_cast<microseconds>(stop - start).count() << "[us] , ";
+                    if (enableDebug) logfile << " memcpy: " << duration_cast<microseconds>(stop - start).count() << " , ";
                 }
 
             }
@@ -312,7 +312,7 @@ int acquireIm(unsigned char* bp)
             //lStream.QueueBuffer(lBuffer);
             lPipeline.ReleaseBuffer(lBuffer);
             stop = high_resolution_clock::now();
-            if (enableDebug) logfile << " queue buffer: " << duration_cast<microseconds>(stop - start).count() << "[us]";
+            if (enableDebug) logfile << " queue buffer: " << duration_cast<microseconds>(stop - start).count() << "ms";
         }
         if (enableDebug) logfile << "\n";
     }
@@ -362,24 +362,27 @@ int conf(int p, int v)
     {
     case 1:
         lInBuffer[1] = 1;
-        if (v <= 2 && v >= 0)
+        if (v != 0 && v != 1 && v != 2)
         {
-            lInBuffer[2] = (PvUInt8)v;
+            return -1;
         }
+        lInBuffer[2] = (PvUInt8)v;
         break;
     case 2:
         lInBuffer[1] = 2;
-        if (v <= 0 && v >= 199)
+        if (v < 0 || v > 199)
         {
-            lInBuffer[2] = (PvUInt8)v;
+            return -1;
         }
+        lInBuffer[2] = (PvUInt8)v;
         break;
     case 3:
         lInBuffer[1] = 3;
-        if (v >= 0 && v <= 128)
+        if (v < 0 || v > 128)
         {
-            lInBuffer[2] = (PvUInt8)v;
+            return -1;
         }
+        lInBuffer[2] = (PvUInt8)v;
         break;
     case 5:
         lInBuffer[1] = 5;
@@ -389,28 +392,31 @@ int conf(int p, int v)
         break;
     case 7:
         lInBuffer[1] = 7;
-        if (v >= 0 && v <= 1)
+        if (v != 0 && v != 1)
         {
-            lInBuffer[2] = (PvUInt8)v;
+            return -1;
         }
+        lInBuffer[2] = (PvUInt8)v;
         break;
     case 8:
         lInBuffer[1] = 8;
-        if (v >= 0 && v <= 1)
+        if (v != 0 && v != 1)
         {
-            lInBuffer[2] = (PvUInt8)v;
+            return -1;
         }
+        lInBuffer[2] = (PvUInt8)v;
         break;
     case 9:
         lInBuffer[1] = 9;
-        if (v >= 0 && v <= 1)
+        if (v != 0 && v != 1)
         {
-            lInBuffer[2] = (PvUInt8)v;
+            return -1;
         }
+        lInBuffer[2] = (PvUInt8)v;
         break;
     default:
         lPort.Close();
-        return 1;
+        return -1;
     }
 
 
@@ -420,7 +426,7 @@ int conf(int p, int v)
     if (!lResult.IsOK())
     {
         // Unable to send data over serial port!
-        return 1;
+        return -1;
     }
 
     // Close serial port
@@ -443,8 +449,7 @@ int SetDelay(int v)
     if (v < 0 || v > 199) {
         return -1;
     }
-    conf(2, v);
-    return 0;
+    return conf(2, v);
 }
 
 int SetCoupling(int i)
